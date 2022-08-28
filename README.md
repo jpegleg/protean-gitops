@@ -21,7 +21,7 @@ The general design pattern with protean-gitops is to use a seprate job schedulin
 
 #### Writing .protean file functions
 
-Here is an example .protean file for `mihno`, a rust honeypot.
+Here is an example `.protean` file for mihno, a rust honeypot.
 
 ```
 
