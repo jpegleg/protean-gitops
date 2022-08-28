@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+export dir=$(echo $1 | rev | cut -d'/' -f1 | rev)
+export log=/opt/protean-gitops/PROTEAN-GITOPS__"$dir"_$(date +%y%m%d%H%M%S).log
+export COSIGN_PASSWORD=$(cat /opt/protean-gitops/cosign_id.txt)
+
+protean_test () {
+  echo "Placeholder function, no tests imported."
+}
+
+protean_build () {
+  echo "Placeholder function, no special build steps imported."
+}
+
+cosigninstall () {
+  wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64" && mv cosign-linux-amd64 /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
+}
+
+trapexit () {
+  if [ "$FIRSTPULL" == "YES" ]; then
+    echo "First time run for $dir"
+  else
+    echo "No changes from git pull, nothing to do." > $log
+    exit 1
+  fi
+}
+
+firstpull () {
+  git clone "$1"
+  export FIRSTPULL=YES
+}
+
+initials () {
+  echo " --- INITIALIZE BUILD --- "
+  which syft || curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+  which cosign || cosigninstall
+  cd /opt/protean-gitops || mkdir -p /opt/protean-gitops || exit 1
+  ls -larth $dir || firstpull $1 || exit 1
+  find $dir -exec sha256sum {} 2>/dev/null \;
+  cd /opt/protean-gitops/$dir
+  git status
+  git pull 2>&1 | grep main || trapexit
+  git status
+  source .protean || echo "No protean config found."
+}
+
+checkfordockerfile () {
+  ls Dockerfile || export DOCKERFILESET=NO
+}
+
+dockerartifacts () {
+  if [ "$DOCKERFILESET" == "NO" ]; then
+    echo "No Dockerfile found, not building Docker artifacts..."
+  else
+    docker build -t "$dir:test" .  
+    docker tag "$dir:test" "localhost:5000/$dir:test" 
+    docker push "localhost:5000/$dir:test" 
+    docker save "localhost:5000/$dir:test" > /opt/protean-gitops/"$dir"_oci.tgz 
+    syft "localhost:5000/$dir:test" -o json > /opt/protean-gitops/"$dir"_"$buildtime".SBOM 
+    cosign sign --key ../cosign.key "localhost:5000/$dir:test"
+    cosign attest --predicate /opt/protean-gitops/"$dir"_"$buildtime".SBOM --key ../cosign.key "localhost:5000/$dir:test"
+  fi
+}
+
+genartifacts () {
+  echo " --- GENERATE ARTIFACTS --- "
+  buildtime=$(date +%Y%m%d%H%M%S)
+  cd /opt/protean-gitops/$dir
+  checkfordockerfile
+  dockerartifacts
+}
+
+buildit () {
+  echo " --- BUILD STEPS --- "
+  protean_build 
+}
+
+testit () {
+  echo " --- TESTS --- "
+  protean_test
+}
+
+genkey () {
+  cd /opt/protean-gitops && cosign generate-key-pair
+}
+initials $1 >> $log
+ls /opt/protean-gitops/cosign.key || genkey
+buildit >> $log
+genartifacts >> $log
+testit >> $log 2> "$log"__TEST_STDERR
+find /opt/protean-gitops/ -name "*__TEST_STDERR" -size 0 -exec rm {} \;
