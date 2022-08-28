@@ -50,3 +50,18 @@ We might even integrate protean-gitops with Jenkins, although that seems funny, 
 We can add and expand on protean-gitops easily, it is very flexiable by design. If we want to bake in custom code, no problem. If we want to add a database, PKI, WUI, we can integrate and expand to whatever else is needed.
 
 I am enjoying including Kubernetes and Ansible intergrations in my .protean files, executing deployments in the protean_test function if the tests passed.
+
+### Cleaning up
+
+There is an included script called `cleaner_1.sh` that is installed with install.sh to /usr/local/sbin/cleaner_1.sh. This script will remove files in /opt/protean-gitops/ ending in .log that are less than 1 kilobyte and remove them. This cleaner is not scheduled or used automatically, you will need to determine how you will want to clean up files. When a proteus polling is completed but there were not changes to the git repo, a log file is created states there were no changes. The cleaner_1.sh script removes these "non-event" log files.
+
+Here is an example approach with cron:
+
+```
+2-56 * * * * /usr/local/sbin/proteus https://github.com/jpegleg/mihno
+2-56 * * * * sleep 20 && /usr/local/sbin/proteus https://github.com/jpegleg/salsa_falcon
+58 * * * * /usr/local/sbin/cleaner_1.sh
+```
+This approach leaves the top of the hour and the end of the hour free of jobs and cleans up on the 58th minute of each hour.
+
+As far as cleaning the artifacts and larger logs for real jobs, there may be another process, such as archival, that is desired there. Management of generated data is not included in this repo, that is up to you.
