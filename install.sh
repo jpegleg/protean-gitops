@@ -19,5 +19,11 @@ ls cosign.key || cosign generate-key-pair
 
 echo
 echo "The design pattern is to use anacron or cron to schedule proteus SCM polling, however it can be scheduled however you like!"
+echo
+echo "Run a SCM poll against a git repo like so:"
+echo "proteus https://github.com/jpegleg/mihno"
+echo
+echo "Files and artifacts are stored in /opt/protean-gitops/"
+echo
 echo "Enjoy!"
 
