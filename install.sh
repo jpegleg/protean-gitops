@@ -9,12 +9,18 @@ cosigninstall () {
   wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64" && mv cosign-linux-amd64 /usr/local/bin/cosign && chmod +x /usr/local/bin/cosign
 }
 
+gencosignid () {
+  cat /dev/urandom | head -n12 | b2sum | awk '{print $1}' > /opt/protean-gitops/cosign_id.txt
+  export COSIGN_PASSWORD=$(cat /opt/protean-gitops/cosign_id.txt)
+}
+
 which syft || curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 which cosign || cosigninstall
 cp proteus /usr/local/sbin/
 chmod +x /usr/local/sbin/proteus
 mkdir -p /opt/protean-gitops
 cd /opt/protean-gitops
+ls cosign_id.txt || gencosignid
 ls cosign.key || cosign generate-key-pair
 
 echo
