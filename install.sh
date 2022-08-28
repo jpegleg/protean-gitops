@@ -17,7 +17,9 @@ gencosignid () {
 which syft || curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
 which cosign || cosigninstall
 cp proteus /usr/local/sbin/
+cp cleaner_1.sh /usr/local/sbin/
 chmod +x /usr/local/sbin/proteus
+chmod +x /usr/local/sbin/cleaner_1.sh
 mkdir -p /opt/protean-gitops
 cd /opt/protean-gitops
 ls cosign_id.txt || gencosignid
