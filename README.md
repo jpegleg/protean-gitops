@@ -12,14 +12,11 @@ proteus https://github.com/jpegleg/mihno
 ```
 If there is no local copy of a target repo in /opt/protean-gitops/ then proteus will clone and execute the pipeline. If a local copy already exists, proteus will do a `pull` and only build if there are changes.
 
-The general design pattern with protean-gitops is to use anacon to schedule each GitOps job. This example shows installing and starting anacron and setting a job to check each hour for changes.
+The general design pattern with protean-gitops is to use a seprate job scheduling service such as anacron or cron. Here is an example crontab to poll two repositories each minute:
 
 ```
-apt-get install anacron
-systemctl enable anacron
-systemctl start anacron
-echo "/usr/local/sbin/proteus https://github.com/jpegleg/mihno" > /etc/cron.hourly/protean-gitops_mihno
-chmod +x /etc/cron.hourly/protean-gitops_mihno
+* * * * * /usr/local/sbin/proteus ssh://somerepoplace.local/mythings
+* * * * * /usr/local/sbin/proteus https://github.com/jpegleg/mihno
 ```
 
 #### Writing .protean file functions
