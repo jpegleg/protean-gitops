@@ -3,6 +3,8 @@ A minimalist shell based GitOps system: no gui, cosign and syft for container SB
 
 Git projects can container a `.protean` file that is designed to include (source) two functions, protean_build and protean_test. The build function is for whatever we want to do in the job, from compiling, to download, infalting, whatever is needed. The build is before artifact step. The artifact step is designed for projects with Dockerfile in the repository root and will automatically save container images and generate signed SBOM for them. After the artifact step, then the protean_test function runs. The test function can be treated as a pipeline for testing and deployments.
 
+<b>Note that the `.protean` file can do anything by default, so a git project has effective root code execution on the system running proteus pointed at that project. Sandbox and limit the system that runs proteus, and more importantly, ensure the git repository is well secured. Also, the sourcing of the `.protean` file can be easily removed from proteus, however then all functionality must be included in proteus directly, etc.</b>
+
 ## Proteus local Docker registry
 
 The default functionality of proteus expects a local Docker registry on port 5000 which it will use with cosign. The registry can be changed, or proteus can also be used without Docker or without default Docker functions. The majority of the functionality comes from a project's specific `.protean` file, however proteus has some default artifact generation for projects with a Dockerfile in the project root.
