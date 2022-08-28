@@ -33,6 +33,7 @@ protean_build() {
 protean_test() {
   cargo test
   cargo clean
+  trivy image "localhost:5000/mihno:test" > ../mihno_trivy-report_$(date +%Y%m%d%H%M%S).txt
 }
 
 ```
