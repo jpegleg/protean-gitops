@@ -82,6 +82,7 @@ testit () {
 genkey () {
   cd /opt/protean-gitops && cosign generate-key-pair
 }
+
 initials $1 >> $log
 ls /opt/protean-gitops/cosign.key || genkey
 buildit >> $log
