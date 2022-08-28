@@ -15,7 +15,7 @@ cp proteus /usr/local/sbin/
 chmod +x /usr/local/sbin/proteus
 mkdir -p /opt/protean-gitops
 cd /opt/protean-gitops
-cosign generate-key-pair
+ls cosign.key || cosign generate-key-pair
 
 echo
 echo "The design pattern is to use anacron or cron to schedule proteus SCM polling, however it can be scheduled however you like!"
