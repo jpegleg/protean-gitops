@@ -39,6 +39,9 @@ protean_test() {
 
 While this .protean example is focused on the rust compiler, we could do whatever we needed to do in these functions, they are truly open ended.
 
+Include the `.protean` file in the root of the git repository targeted by proteus.
+
+
 ### Why cli and not something standard like Jenkins or a cloud service?
 
 In many cases, we won't get the opportunity to use something like protean-gitops and will need to work with something like jenkins, gitlab, etc. However standard and feature rich, those systems have a much larger attack surface. If we have the opportunity to avoid GUIs and large platforms, we can via tools like this. We can create a much tighter pipeline that doesn't need any ports exposed to run, although we can expose a system running protean-gitops with ssh, or whatever else we like. Jenkins often requires constant patching and potentially complicated maintenance and configuration. If we don't need all those features, we can avoid much of the operational costs and risks with a more simple system.
