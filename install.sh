@@ -25,6 +25,11 @@ cd /opt/protean-gitops
 ls cosign_id.txt || gencosignid
 ls cosign.key || cosign generate-key-pair
 
+echo "Checking for local Docker registry..."
+docker image ls | grep registry
+curl localhost:5000 || docker run -d -it --restart unless-stopped -p 5000:5000 registry || echo "Unable to start local registry. Either edit /usr/local/sbin/proteus to use the registry of your choice, or install docker and run a local registry if you want to leverage the default proteus docker build and sign features."
+
+
 echo
 echo "The design pattern is to use anacron or cron to schedule proteus SCM polling, however it can be scheduled however you like!"
 echo
