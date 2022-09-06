@@ -54,7 +54,7 @@ dockerartifacts () {
     docker build -t "$dir:test" .  
     docker tag "$dir:test" "localhost:5000/$dir:test" 
     docker push "localhost:5000/$dir:test" 
-    docker save "localhost:5000/$dir:test" > /opt/protean-gitops/"$dir"_oci.tgz 
+    docker save "localhost:5000/$dir:test" > /opt/protean-gitops/"$dir"_oci.tar
     syft "localhost:5000/$dir:test" -o json > /opt/protean-gitops/"$dir"_"$buildtime".SBOM 
     cosign sign --key ../cosign.key "localhost:5000/$dir:test"
     cosign attest --predicate /opt/protean-gitops/"$dir"_"$buildtime".SBOM --key ../cosign.key "localhost:5000/$dir:test"
